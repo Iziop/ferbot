@@ -11,6 +11,8 @@ from telebot_calendar import CallbackData
 from datetime import timedelta
 from multiprocessing import Process
 from telebot.types import ReplyKeyboardRemove, CallbackQuery
+import threading
+
 now = datetime.datetime.today()+timedelta(days=1)
 
 
@@ -38,6 +40,7 @@ def addtoquestions(id,text):
        bot.send_message(id,dataop)
 
 def sendl():
+    threading.Timer(10.0, sendl).start()
     dataop=now.strftime('%d.%m.%Y')
     
     conn = sqlite3.connect('baza.db')
@@ -99,14 +102,7 @@ def callback_inline(call: CallbackQuery):
         )
         print(f"{calendar_1}: Cancellation")
 
-def timer():
-    schedule.every().day.at("04:00").do(sendl)
-    while True:
-        schedule.run_pending()
-        time.sleep(1)
 
-p1 = Process(target=timer)
-p1.run()
-p1.start()
+sendl()
 
 bot.polling(none_stop=True)
